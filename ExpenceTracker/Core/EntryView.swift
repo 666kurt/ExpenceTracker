@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  ExpenceTracker
-//
-//  Created by Максим Шишлов on 03.11.2024.
-//
-
 import SwiftUI
 
 struct EntryView: View {
@@ -15,19 +8,19 @@ struct EntryView: View {
     var body: some View {
         TabView(selection: $coordinator.selectedScreen) {
             
-            Text("Recent")
+            RecentScreen()
                 .tag(Screens.recents)
                 .tabItem { Screens.recents.tabContent }
             
-            Text("Search")
+            SearchScreen()
                 .tag(Screens.search)
                 .tabItem { Screens.search.tabContent }
             
-            Text("Chart")
+            ChartScreen()
                 .tag(Screens.charts)
                 .tabItem { Screens.charts.tabContent }
             
-            Text("Settings")
+            SettingsScreen()
                 .tag(Screens.settings)
                 .tabItem { Screens.settings.tabContent }
             
