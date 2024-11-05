@@ -22,4 +22,21 @@ extension View {
         
         return .zero
     }
+    
+    /// Date Formatter
+    func format(date: Date, format: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        
+        return formatter.string(from: date)
+    }
+    
+    /// Currency Formatter
+    func currencyFormatter(_ value: Double, digits: Int = 2) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.maximumFractionDigits = digits
+        
+        return formatter.string(from: .init(value: value)) ?? ""
+    }
 }

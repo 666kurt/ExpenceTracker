@@ -2,7 +2,17 @@ import SwiftUI
 
 struct RecentScreen: View {
     
+    /// User props
     @AppStorage("userName") private var userName: String = ""
+    
+    /// View props
+    @State private var startOfMonth: Date = .now.startOfMonth
+    @State private var endOfMonth: Date = .now.endOfMonth
+    @State private var selectedCategory: Category = .income
+    @State private var showFilterView: Bool = false
+    
+    /// Props for animation
+    @Namespace private var animation
     
     var body: some View {
         GeometryReader {
@@ -13,14 +23,48 @@ struct RecentScreen: View {
                 ScrollView(.vertical) {
                     LazyVStack(spacing: 10, pinnedViews: [.sectionHeaders]) {
                         Section {
+                            /// Date filter button
+                            Button {
+                                showFilterView = true
+                            } label: {
+                                Text("\(format(date: startOfMonth, format: "dd MMM yy")) - \(format(date: endOfMonth, format: "dd MMM yy"))")
+                                    .font(.caption2)
+                                    .foregroundStyle(.gray)
+                                
+                            }
+                            .hSpacing(.leading)
                             
+                            /// Card View
+                            RecentCardView(income: 3254, expense: 1234)
+                            
+                            SegmentedControl()
+                            
+                            ForEach(sampleTransaction.filter({ $0.category == selectedCategory.rawValue })) { transaction in
+                                TransactionRowView(transaction: transaction)
+                            }
                         } header: {
                             HeaderView(size)
                         }
                     }
                     .padding(15)
                 }
+                .background(.gray.opacity(0.15))
+                .blur(radius: showFilterView ? 8 : 0)
+                .disabled(showFilterView)
             }
+            .overlay {
+                if showFilterView {
+                    DateFilterView(start: startOfMonth, end: endOfMonth) { start, end in
+                        startOfMonth = start
+                        endOfMonth = end
+                        showFilterView = false
+                    } onClose: {
+                        showFilterView = false
+                    }
+                    .transition(.move(edge: .leading))
+                }
+            }
+            .animation(.snappy, value: showFilterView)
         }
         
     }
@@ -73,6 +117,33 @@ struct RecentScreen: View {
             .padding(.horizontal, -15)
             .padding(.top, -(safeArea.top + 15))
         }
+    }
+    
+    @ViewBuilder
+    func SegmentedControl() -> some View {
+        HStack(spacing: 0) {
+            ForEach(Category.allCases, id: \.rawValue) { category in
+                Text(category.rawValue)
+                    .hSpacing()
+                    .padding(.vertical, 10)
+                    .background {
+                        if selectedCategory == category {
+                            Capsule()
+                                .fill(.background)
+                                .matchedGeometryEffect(id: "ACTIVETAB", in: animation)
+                        }
+                    }
+                    .contentShape(.capsule)
+                    .onTapGesture {
+                        withAnimation(.snappy) {
+                            selectedCategory = category
+                        }
+                    }
+            }
+        }
+        .background(.gray.opacity(0.15), in: .capsule)
+        .padding(.top, 5)
+        .padding(.bottom, 10)
     }
 }
 
