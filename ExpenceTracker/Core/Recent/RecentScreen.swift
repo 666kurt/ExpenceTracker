@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct RecentScreen: View {
     
@@ -13,6 +14,9 @@ struct RecentScreen: View {
     
     /// Props for animation
     @Namespace private var animation
+    
+    /// SwiftData props
+    @Query(sort: [SortDescriptor(\Transaction.dateAdded, order: .reverse)], animation: .snappy) private var transactions: [Transaction]
     
     var body: some View {
         GeometryReader {
@@ -39,8 +43,13 @@ struct RecentScreen: View {
                             
                             SegmentedControl()
                             
-                            ForEach(sampleTransaction.filter({ $0.category == selectedCategory.rawValue })) { transaction in
-                                TransactionRowView(transaction: transaction)
+                            ForEach(transactions) { transaction in
+                                NavigationLink {
+                                    NewExpenceView(editTranstacion: transaction)
+                                } label: {
+                                    TransactionRowView(transaction: transaction)
+                                }
+                                .buttonStyle(.plain)
                             }
                         } header: {
                             HeaderView(size)
@@ -92,7 +101,7 @@ struct RecentScreen: View {
             Spacer()
             
             NavigationLink {
-                
+                NewExpenceView()
             } label: {
                 Image(systemName: "plus")
                     .font(.title3.weight(.semibold))

@@ -1,8 +1,8 @@
-import Foundation
+import SwiftData
 import SwiftUI
 
-struct Transaction: Identifiable {
-    let id: UUID = .init()
+@Model
+class Transaction {
     /// Props
     var title: String
     var remarks: String
@@ -23,6 +23,14 @@ struct Transaction: Identifiable {
     /// Extracting color value from tintColor string
     var color: Color {
         return tints.first(where: { $0.color == tintColor })?.value ?? Color(.tintColor)
+    }
+    
+    var tint: TintColor? {
+        return tints.first(where: { $0.color == tintColor })
+    }
+    
+    var rawCategory: Category? {
+        return Category.allCases.first(where: { category == $0.rawValue })
     }
 }
 

@@ -6,5 +6,6 @@ struct ExpenceTrackerApp: App {
         WindowGroup {
             EntryView()
         }
+        .modelContainer(for: [Transaction.self])
     }
 }

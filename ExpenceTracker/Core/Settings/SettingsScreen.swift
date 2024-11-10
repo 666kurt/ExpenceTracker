@@ -1,8 +1,16 @@
 import SwiftUI
 
 struct SettingsScreen: View {
+    @AppStorage("userName") private var userName: String = ""
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            List {
+                Section("User name") {
+                    TextField("Enter you name", text: $userName)
+                }
+            }
+            .navigationTitle("Settings")
+        }
     }
 }
 
