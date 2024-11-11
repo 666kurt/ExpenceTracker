@@ -14,10 +14,7 @@ struct RecentScreen: View {
     
     /// Props for animation
     @Namespace private var animation
-    
-    /// SwiftData props
-    @Query(sort: [SortDescriptor(\Transaction.dateAdded, order: .reverse)], animation: .snappy) private var transactions: [Transaction]
-    
+
     var body: some View {
         GeometryReader {
             /// For animation
@@ -38,18 +35,19 @@ struct RecentScreen: View {
                             }
                             .hSpacing(.leading)
                             
-                            /// Card View
-                            RecentCardView(income: 3254, expense: 1234)
-                            
-                            SegmentedControl()
-                            
-                            ForEach(transactions) { transaction in
-                                NavigationLink {
-                                    NewExpenceView(editTranstacion: transaction)
-                                } label: {
-                                    TransactionRowView(transaction: transaction)
+                            FilterTransactionsView(startDate: startOfMonth, endDate: endOfMonth) { transactions in
+                                /// Card View
+                                RecentCardView(income: total(transactions, category: .income),
+                                               expense: total(transactions, category: .expense))
+                                
+                                SegmentedControl()
+                                
+                                ForEach(transactions.filter({ $0.category == selectedCategory.rawValue })) { transaction in
+                                    NavigationLink(value: transaction) {
+                                        TransactionRowView(transaction: transaction)
+                                    }
+                                    .buttonStyle(.plain)
                                 }
-                                .buttonStyle(.plain)
                             }
                         } header: {
                             HeaderView(size)
@@ -60,6 +58,9 @@ struct RecentScreen: View {
                 .background(.gray.opacity(0.15))
                 .blur(radius: showFilterView ? 8 : 0)
                 .disabled(showFilterView)
+                .navigationDestination(for: Transaction.self) { transaction in
+                    TransactionView(editTranstacion: transaction)
+                }
             }
             .overlay {
                 if showFilterView {
@@ -101,7 +102,7 @@ struct RecentScreen: View {
             Spacer()
             
             NavigationLink {
-                NewExpenceView()
+                TransactionView()
             } label: {
                 Image(systemName: "plus")
                     .font(.title3.weight(.semibold))

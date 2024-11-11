@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct NewExpenceView: View {
+struct TransactionView: View {
     /// Enviroment props
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
@@ -44,12 +44,17 @@ struct NewExpenceView: View {
                         .hSpacing(.leading)
                     
                     HStack(spacing: 15) {
-                        TextField("0.0", value: $amount, formatter: numberFormatter)
-                            .padding(.horizontal, 15)
-                            .padding(.vertical, 12)
-                            .background(.background, in: .rect(cornerRadius: 10))
-                            .frame(maxWidth: 130)
-                            .keyboardType(.decimalPad)
+                        HStack {
+                            Text(currencySymbol)
+                                .font(.callout.bold())
+                            TextField("0.0", value: $amount, formatter: numberFormatter)
+                                .keyboardType(.decimalPad)
+                        }
+                        .padding(.horizontal, 15)
+                        .padding(.vertical, 12)
+                        .background(.background, in: .rect(cornerRadius: 10))
+                        .frame(maxWidth: 130)
+          
                         
                         CategoryCheckBox()
                     }
@@ -73,7 +78,7 @@ struct NewExpenceView: View {
             }
             .padding(15)
         }
-        .navigationTitle("Add Transactions")
+        .navigationTitle("\(editTranstacion == nil ? "Add" : "Edit") Transactions")
         .background(.gray.opacity(0.15))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -98,13 +103,21 @@ struct NewExpenceView: View {
     
     /// Saving data to swiftdata
     func save() {
-        let transaction = Transaction(title: title,
-                                      remarks: remarks,
-                                      amount: amount,
-                                      dateAdded: dateAdded,
-                                      category: category,
-                                      tintColor: tint)
-        context.insert(transaction)
+        if editTranstacion != nil {
+            editTranstacion?.title = title
+            editTranstacion?.remarks = remarks
+            editTranstacion?.amount = amount
+            editTranstacion?.dateAdded = dateAdded
+            editTranstacion?.category = category.rawValue
+        } else {
+            let transaction = Transaction(title: title,
+                                          remarks: remarks,
+                                          amount: amount,
+                                          dateAdded: dateAdded,
+                                          category: category,
+                                          tintColor: tint)
+            context.insert(transaction)
+        }
         dismiss()
     }
     
@@ -164,6 +177,6 @@ struct NewExpenceView: View {
 
 #Preview {
     NavigationStack {
-        NewExpenceView()
+        TransactionView()
     }
 }

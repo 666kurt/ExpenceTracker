@@ -3,6 +3,8 @@ import SwiftUI
 struct TransactionRowView: View {
     
     let transaction: Transaction
+    var showsCategory: Bool = false
+    @Environment(\.modelContext) private var context
     
     var body: some View {
         SwipeAction(cornerRadius: 10, direction: .trailing) {
@@ -25,6 +27,16 @@ struct TransactionRowView: View {
                     Text(format(date: transaction.dateAdded, format: "dd MMM yyyy"))
                         .font(.caption2)
                         .foregroundStyle(.gray)
+                    
+                    if showsCategory {
+                        Text(transaction.category)
+                            .font(.caption2)
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .foregroundStyle(.white)
+                            .background(transaction.category == Category.income.rawValue ? Color.green.gradient : Color.red.gradient,
+                                        in: .capsule)
+                    }
                         
                 }
                 .lineLimit(1)
@@ -38,7 +50,7 @@ struct TransactionRowView: View {
             .background(.background, in: .rect(cornerRadius: 10))
         } actions: {
             Action(tint: .red, icon: "trash") {
-                // TODO: delete
+                context.delete(transaction)
             }
         }
     }
